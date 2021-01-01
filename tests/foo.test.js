@@ -1,3 +1,6 @@
-test('blah', () => {
-    expect(1).toBe(1)
-})
+const { Game } = require("../src/domain/game.js");
+
+test("blah", () => {
+    const game = new Game();
+    expect(game.foo).toBe(1);
+});
