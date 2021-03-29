@@ -1,4 +1,6 @@
-class Game {
+export class Game {
+    foo: number
+
     constructor() {
         this.foo = 1
     }
@@ -7,5 +9,3 @@ class Game {
         return 1
     }
 }
-
-exports.Game = Game
