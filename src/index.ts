@@ -2,7 +2,10 @@
 
 import express from 'express'
 import * as dotenv from 'dotenv'
+import { User } from './domain/user'
 
 dotenv.config()
 
-console.log('dave')
+let f = new User('dave')
+console.log(f.id)
+console.log(f.username)
