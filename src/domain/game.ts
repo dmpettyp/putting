@@ -1,3 +1,6 @@
+import { v4 as uuidv4 } from 'uuid'
+
+import { CannotCompleteTurnError } from './exceptions'
 import { ThrowResult, Throws } from './throws'
 import { Turn } from './turn'
 
@@ -7,18 +10,29 @@ export enum GameState {
     COMPLETED,
 }
 
+const WINNING_SCORE = 4
+
 class PlayerGame {
+    constructor(public playerId: string) {}
+
     turns: Turn[] = []
 
     score: number = 0
 
-    constructor(public playerId: string) {}
+    addCompleteTurn(turn: Turn) {
+        this.turns.push(turn)
+        this.score += turn.score
+    }
+
+    hasWon(): boolean {
+        return this.score >= WINNING_SCORE
+    }
 }
 
 export class Game {
-    state: GameState = GameState.INIT
+    constructor(public number: number = 0, public id: string = uuidv4()) {}
 
-    number: number = 1
+    state: GameState = GameState.INIT
 
     startDate?: Date
 
@@ -28,10 +42,12 @@ export class Game {
 
     nextTurns: Turn[] = []
 
-    constructor(playerIds: string[], number?: number) {
-        this.players = playerIds.map((playerId) => {
-            return new PlayerGame(playerId)
-        })
+    addPlayers(playerIds: string[]) {
+        this.players.push(
+            ...playerIds.map((playerId) => {
+                return new PlayerGame(playerId)
+            })
+        )
     }
 
     start() {
@@ -53,15 +69,39 @@ export class Game {
         this.state = GameState.COMPLETED
     }
 
-    completeTurn(throws: Throws): GameState {
+    completeTurn(turnId: string, throws: Throws): GameState {
         if (this.state != GameState.IN_PROGRESS) {
             throw Error('Game is not in progress')
         }
 
+        const { turn, player } = this.getCurrentTurn(turnId)
+
+        const nextTurn = turn.complete(throws)
+
+        player.addCompleteTurn(turn)
+
+        this.nextTurns.push(nextTurn)
+
+        if (player.hasWon()) {
+            this.end()
+        }
+
+        this.advanceSkipTurns()
+
+        return this.state
+    }
+
+    getCurrentTurn(turnId: string) {
         const turn = this.nextTurns.shift()
 
         if (turn === undefined) {
-            throw Error('No turns available')
+            throw new CannotCompleteTurnError('Game has no turns available')
+        }
+
+        if (turn.id != turnId) {
+            throw new CannotCompleteTurnError(
+                'ID of current turn does not match'
+            )
         }
 
         const player = this.players.find(
@@ -69,21 +109,28 @@ export class Game {
         )
 
         if (player === undefined) {
-            throw Error(`No player {turn.playerId} found for turn`)
+            throw new CannotCompleteTurnError(
+                `No player {turn.playerId} found for turn`
+            )
         }
 
-        const nextTurn = turn.complete(throws)
+        return { turn, player }
+    }
 
-        this.nextTurns.push(nextTurn)
+    advanceSkipTurns() {
+        while (true) {
+            const turn = this.nextTurns.shift()
 
-        player.turns.push(turn)
+            if (turn === undefined) {
+                return
+            }
 
-        player.score += turn.score
+            if (!turn.isSkip()) {
+                this.nextTurns.unshift(turn)
+                return
+            }
 
-        if (player.score >= 4) {
-            this.end()
+            this.nextTurns.push(turn.complete())
         }
-
-        return this.state
     }
 }
