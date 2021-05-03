@@ -1,46 +1,21 @@
 import { Turn, Level } from '../src/domain/turn'
-import { Throws, ThrowResult } from '../src/domain/throws'
+import { Throws, Throw } from '../src/domain/throws'
 
-const noMakes = new Throws(
-    ThrowResult.MISS,
-    ThrowResult.MISS,
-    ThrowResult.MISS,
-    ThrowResult.MISS
-)
+const noMakes = new Throws(Throw.Miss, Throw.Miss, Throw.Miss, Throw.Miss)
 
-const oneMake = new Throws(
-    ThrowResult.MAKE,
-    ThrowResult.MISS,
-    ThrowResult.MISS,
-    ThrowResult.MISS
-)
+const oneMake = new Throws(Throw.Make, Throw.Miss, Throw.Miss, Throw.Miss)
 
-const twoMakes = new Throws(
-    ThrowResult.MAKE,
-    ThrowResult.MAKE,
-    ThrowResult.MISS,
-    ThrowResult.MISS
-)
+const twoMakes = new Throws(Throw.Make, Throw.Make, Throw.Miss, Throw.Miss)
 
-const threeMakes = new Throws(
-    ThrowResult.MAKE,
-    ThrowResult.MAKE,
-    ThrowResult.MAKE,
-    ThrowResult.MISS
-)
+const threeMakes = new Throws(Throw.Make, Throw.Make, Throw.Make, Throw.Miss)
 
-const allMakes = new Throws(
-    ThrowResult.MAKE,
-    ThrowResult.MAKE,
-    ThrowResult.MAKE,
-    ThrowResult.MAKE
-)
+const allMakes = new Throws(Throw.Make, Throw.Make, Throw.Make, Throw.Make)
 
 const playerId = 'dmp'
 
 test('initial turn', () => {
     const turn = new Turn(playerId)
-    expect(turn.level).toBe(Level.LEVEL1)
+    expect(turn.level).toBe(Level.Level1)
 })
 
 describe('skip level', () => {
@@ -48,7 +23,7 @@ describe('skip level', () => {
     let nextTurn: Turn
 
     beforeEach(() => {
-        turn = new Turn(playerId, 1, Level.SKIP)
+        turn = new Turn(playerId, 1, Level.Skip)
     })
 
     afterEach(() => {
@@ -58,7 +33,7 @@ describe('skip level', () => {
 
     test('no throws', () => {
         nextTurn = turn.complete()
-        expect(nextTurn.level).toBe(Level.LEVEL1)
+        expect(nextTurn.level).toBe(Level.Level1)
         expect(turn.score).toBe(0)
     })
 
@@ -74,7 +49,7 @@ describe('first level', () => {
     let nextTurn: Turn
 
     beforeEach(() => {
-        turn = new Turn(playerId, 1, Level.LEVEL1)
+        turn = new Turn(playerId, 1, Level.Level1)
     })
 
     afterEach(() => {
@@ -84,31 +59,31 @@ describe('first level', () => {
 
     test('no makes', () => {
         nextTurn = turn.complete(noMakes)
-        expect(nextTurn.level).toBe(Level.SKIP)
+        expect(nextTurn.level).toBe(Level.Skip)
         expect(turn.score).toBe(0)
     })
 
     test('one make', () => {
         nextTurn = turn.complete(oneMake)
-        expect(nextTurn.level).toBe(Level.SKIP)
+        expect(nextTurn.level).toBe(Level.Skip)
         expect(turn.score).toBe(0)
     })
 
     test('two makes', () => {
         nextTurn = turn.complete(twoMakes)
-        expect(nextTurn.level).toBe(Level.SKIP)
+        expect(nextTurn.level).toBe(Level.Skip)
         expect(turn.score).toBe(0)
     })
 
     test('three makes', () => {
         nextTurn = turn.complete(threeMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL1)
+        expect(nextTurn.level).toBe(Level.Level1)
         expect(turn.score).toBe(0)
     })
 
     test('four makes', () => {
         nextTurn = turn.complete(allMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL2)
+        expect(nextTurn.level).toBe(Level.Level2)
         expect(turn.score).toBe(0)
     })
 })
@@ -118,7 +93,7 @@ describe('second level', () => {
     let nextTurn: Turn
 
     beforeEach(() => {
-        turn = new Turn(playerId, 1, Level.LEVEL2)
+        turn = new Turn(playerId, 1, Level.Level2)
     })
 
     afterEach(() => {
@@ -128,31 +103,31 @@ describe('second level', () => {
 
     test('no makes', () => {
         nextTurn = turn.complete(noMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL1)
+        expect(nextTurn.level).toBe(Level.Level1)
         expect(turn.score).toBe(0)
     })
 
     test('one make', () => {
         nextTurn = turn.complete(oneMake)
-        expect(nextTurn.level).toBe(Level.LEVEL1)
+        expect(nextTurn.level).toBe(Level.Level1)
         expect(turn.score).toBe(0)
     })
 
     test('two makes', () => {
         nextTurn = turn.complete(twoMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL2)
+        expect(nextTurn.level).toBe(Level.Level2)
         expect(turn.score).toBe(0)
     })
 
     test('three makes', () => {
         nextTurn = turn.complete(threeMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL3)
+        expect(nextTurn.level).toBe(Level.Level3)
         expect(turn.score).toBe(0)
     })
 
     test('four makes', () => {
         nextTurn = turn.complete(allMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL3)
+        expect(nextTurn.level).toBe(Level.Level3)
         expect(turn.score).toBe(0)
     })
 })
@@ -162,7 +137,7 @@ describe('third level', () => {
     let nextTurn: Turn
 
     beforeEach(() => {
-        turn = new Turn(playerId, 1, Level.LEVEL3)
+        turn = new Turn(playerId, 1, Level.Level3)
     })
 
     afterEach(() => {
@@ -172,31 +147,31 @@ describe('third level', () => {
 
     test('no makes', () => {
         nextTurn = turn.complete(noMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL2)
+        expect(nextTurn.level).toBe(Level.Level2)
         expect(turn.score).toBe(0)
     })
 
     test('one make', () => {
         nextTurn = turn.complete(oneMake)
-        expect(nextTurn.level).toBe(Level.LEVEL3)
+        expect(nextTurn.level).toBe(Level.Level3)
         expect(turn.score).toBe(1)
     })
 
     test('two makes', () => {
         nextTurn = turn.complete(twoMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL3)
+        expect(nextTurn.level).toBe(Level.Level3)
         expect(turn.score).toBe(2)
     })
 
     test('three makes', () => {
         nextTurn = turn.complete(threeMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL3)
+        expect(nextTurn.level).toBe(Level.Level3)
         expect(turn.score).toBe(3)
     })
 
     test('four makes', () => {
         nextTurn = turn.complete(allMakes)
-        expect(nextTurn.level).toBe(Level.LEVEL3)
+        expect(nextTurn.level).toBe(Level.Level3)
         expect(turn.score).toBe(4)
     })
 })

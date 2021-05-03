@@ -1,38 +1,25 @@
 import { v4 as uuidv4 } from 'uuid'
 
 import { CannotCompleteTurnError } from './exceptions'
-import { ThrowResult, Throws } from './throws'
+import { Throw, Throws } from './throws'
 import { Turn } from './turn'
+import { PlayerGame } from './playerGame'
 
 export enum GameState {
-    INIT,
-    IN_PROGRESS,
-    COMPLETED,
+    Initialized = 'INIT',
+    InProgress = 'IN_PROGRESS',
+    Completed = 'COMPLETED',
 }
 
-const WINNING_SCORE = 4
-
-class PlayerGame {
-    constructor(public playerId: string) {}
-
-    turns: Turn[] = []
-
-    score: number = 0
-
-    addCompleteTurn(turn: Turn) {
-        this.turns.push(turn)
-        this.score += turn.score
-    }
-
-    hasWon(): boolean {
-        return this.score >= WINNING_SCORE
-    }
+type TurnCompleted = {
+    state: GameState
+    nextTurns: Turn[]
 }
 
 export class Game {
     constructor(public number: number = 0, public id: string = uuidv4()) {}
 
-    state: GameState = GameState.INIT
+    state: GameState = GameState.Initialized
 
     startDate?: Date
 
@@ -50,10 +37,10 @@ export class Game {
         )
     }
 
-    start() {
+    start(): Turn[] {
         this.startDate = new Date()
 
-        this.state = GameState.IN_PROGRESS
+        this.state = GameState.InProgress
 
         let turnNumber = 0
 
@@ -61,16 +48,18 @@ export class Game {
             turnNumber++
             return new Turn(player.playerId)
         })
+
+        return this.nextTurns
     }
 
     end() {
         this.endDate = new Date()
         this.nextTurns = []
-        this.state = GameState.COMPLETED
+        this.state = GameState.Completed
     }
 
-    completeTurn(turnId: string, throws: Throws): GameState {
-        if (this.state != GameState.IN_PROGRESS) {
+    completeTurn(turnId: string, throws: Throws): TurnCompleted {
+        if (this.state != GameState.InProgress) {
             throw Error('Game is not in progress')
         }
 
@@ -88,7 +77,10 @@ export class Game {
 
         this.advanceSkipTurns()
 
-        return this.state
+        return {
+            state: this.state,
+            nextTurns: this.nextTurns,
+        }
     }
 
     getCurrentTurn(turnId: string) {

@@ -1,19 +1,20 @@
-export enum ThrowResult {
-    NONE,
-    MISS,
-    MAKE,
+export enum Throw {
+    Pending = 'PENDING',
+    None = 'NONE',
+    Miss = 'MISS',
+    Make = 'MAKE',
 }
 
 export class Throws {
     constructor(
-        public throw1: ThrowResult = ThrowResult.NONE,
-        public throw2: ThrowResult = ThrowResult.NONE,
-        public throw3: ThrowResult = ThrowResult.NONE,
-        public throw4: ThrowResult = ThrowResult.NONE
+        public throw1: Throw = Throw.None,
+        public throw2: Throw = Throw.None,
+        public throw3: Throw = Throw.None,
+        public throw4: Throw = Throw.None
     ) {}
 
-    throwsCount(resultType: ThrowResult): number {
-        const reducer = (total: number, result: ThrowResult) =>
+    count(resultType: Throw): number {
+        const reducer = (total: number, result: Throw) =>
             total + (result == resultType ? 1 : 0)
 
         return [this.throw1, this.throw2, this.throw3, this.throw4].reduce(
@@ -22,11 +23,7 @@ export class Throws {
         )
     }
 
-    makeCount(): number {
-        return this.throwsCount(ThrowResult.MAKE)
-    }
-
-    isAllNone(): boolean {
-        return this.throwsCount(ThrowResult.NONE) == 4
+    isAll(resultType: Throw): boolean {
+        return this.count(resultType) == 4
     }
 }
